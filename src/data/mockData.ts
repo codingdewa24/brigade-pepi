@@ -1,6 +1,7 @@
 import { User, Brigade, Alsintan, Operator, LaporanHarian, RiwayatService, RiwayatKerusakan, AuditTrail, TargetRealisasi } from '../types';
 import { parseBabelCsvData } from './csvParser';
 import { csvAccountUsers } from './csvAccountData';
+import { csvBrigadeData } from './csvBrigadeData';
 
 export const mockUsers: User[] = [
   { 
@@ -298,6 +299,9 @@ export const mockBrigades: Brigade[] = [
   { id: 'brg-009', name: 'Brigade Aik Danau Belilik Namang', province: 'Kepulauan Bangka Belitung', regency: 'Bangka Tengah', district: 'Namang', village: 'Belilik', leader: 'Mardiono', phone: '081198765432' },
   { id: 'brg-010', name: 'Brigade BP Belitung II Membalong', province: 'Kepulauan Bangka Belitung', regency: 'Belitung', district: 'Membalong', village: 'Perpat', leader: 'Heru Purwono', phone: '081392810398' },
   { id: 'brg-011', name: 'Brigade BP Mufakat Gantung', province: 'Kepulauan Bangka Belitung', regency: 'Belitung Timur', district: 'Gantung', village: 'Gantung', leader: 'Lizar S', phone: '081293029102' },
+  
+  // CSV Brigades
+  ...csvBrigadeData,
 ];
 
 export const mockAlsintanList: Alsintan[] = [

@@ -706,11 +706,11 @@ export default function App() {
                             : 'text-blue-100 hover:text-white hover:bg-blue-800'
                         }`}
                       >
-                        <span className="flex items-center gap-2.5">
-                          <Icon className="w-4 h-4" />
-                          {item.label}
+                        <span className="flex items-center gap-2.5 text-left">
+                          <Icon className="w-4 h-4 shrink-0" />
+                          <span className="leading-tight">{item.label}</span>
                         </span>
-                        <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive ? 'translate-x-0.5 text-white' : 'text-blue-400'}`} />
+                        <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform ${isActive ? 'translate-x-0.5 text-white' : 'text-blue-400'}`} />
                       </button>
                     );
                   })}
