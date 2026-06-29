@@ -6,3 +6,13 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Script utility & data import (tidak perlu masuk ke repo)
+run_parse.py
+scratch_parse.py
+import_to_firestore.mjs
+create_brigade_users.mjs
+parsed_data.json
+daftar_akun_brigade.csv
+DATA*.csv
+data.csv
