@@ -446,9 +446,10 @@ export default function App() {
       localStorage.setItem('alsintan_kerusakan', JSON.stringify(mockRiwayatKerusakan));
       
       // Auto set logged in user profile to Bangka Belitung profile to avoid empty/incorrect state
-      const defaultUser = mockUsers[2] || mockUsers[0]; // Koordinator Babel or Super Admin
-      setCurrentUser(defaultUser);
-      localStorage.setItem('alsintan_user', JSON.stringify(defaultUser));
+      // Removed auto-login for public deployment; user must log in manually
+      // const defaultUser = mockUsers[2] || mockUsers[0]; // Koordinator Babel or Super Admin
+      // setCurrentUser(defaultUser);
+      // localStorage.setItem('alsintan_user', JSON.stringify(defaultUser));
       localStorage.removeItem('alsintan_remembered_uid');
       
       localStorage.setItem('alsintan_migrated_to_babel_v4', 'true');
