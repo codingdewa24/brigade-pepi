@@ -23,8 +23,7 @@ import SdlcDocumentation from './components/SdlcDocumentation';
 import { Toaster } from 'react-hot-toast';
 import WABillingModal from './components/WABillingModal';
 import ProfileModal from './components/ProfileModal';
-import { db } from './lib/firebase';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { supabase } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   BookOpen,
@@ -134,72 +133,54 @@ export default function App() {
     return saved ? JSON.parse(saved) : mockAuditTrail;
   });
 
-  // User accounts with approval states
-  const [localAccounts, setLocalAccounts] = useState<User[]>(() => {
-    const saved = localStorage.getItem('alsintan_registered_accounts_v2');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // Merge any new mock users that aren't in local storage
-      const missingMockUsers = mockUsers.filter(mu => !parsed.some((pu: User) => pu.id === mu.id));
-      return [...parsed, ...missingMockUsers];
-    }
-    return mockUsers;
-  });
+  // User accounts - loaded from Supabase, fallback to mockUsers
+  const [localAccounts, setLocalAccounts] = useState<User[]>(mockUsers);
+  const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
 
-  // Save registered accounts
+  // Supabase Realtime sync
   useEffect(() => {
-    localStorage.setItem('alsintan_registered_accounts_v2', JSON.stringify(localAccounts));
-  }, [localAccounts]);
+    // Initial load of users from Supabase
+    const loadUsers = async () => {
+      setIsLoadingAccounts(true);
+      const { data, error } = await supabase.from('users').select('*');
+      if (!error && data && data.length > 0) {
+        setLocalAccounts(data as User[]);
+      }
+      setIsLoadingAccounts(false);
+    };
+    loadUsers();
 
-  // Firebase Real-time sync for Data
-  useEffect(() => {
-    const unsubLaporan = onSnapshot(collection(db, 'laporan'), (snapshot) => {
-      if (snapshot.empty) return;
-      const onlineLaporan = snapshot.docs.map(doc => doc.data() as LaporanHarian);
-      setLaporanList(prev => {
-        const merged = [...onlineLaporan, ...prev];
-        // deduplicate by id
-        const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
-        // sort by date desc
-        return unique.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      });
-    });
+    // Realtime subscription for laporan_harian
+    const laporanChannel = supabase
+      .channel('laporan_harian_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'laporan_harian' }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setLaporanList(prev => [payload.new as LaporanHarian, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          setLaporanList(prev => prev.map(l => l.id === payload.new.id ? payload.new as LaporanHarian : l));
+        } else if (payload.eventType === 'DELETE') {
+          setLaporanList(prev => prev.filter(l => l.id !== payload.old.id));
+        }
+      })
+      .subscribe();
 
-    const unsubKerusakan = onSnapshot(collection(db, 'kerusakan'), (snapshot) => {
-      if (snapshot.empty) return;
-      const onlineKerusakan = snapshot.docs.map(doc => doc.data() as RiwayatKerusakan);
-      setKerusakanList(prev => {
-        const merged = [...onlineKerusakan, ...prev];
-        const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
-        return unique.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      });
-    });
-
-    const unsubAlsintan = onSnapshot(collection(db, 'alsintan'), (snapshot) => {
-      if (snapshot.empty) return;
-      const onlineAlsintan = snapshot.docs.map(doc => doc.data() as Alsintan);
-      setAlsintanList(prev => {
-        const merged = [...onlineAlsintan, ...prev];
-        const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
-        return unique; // or sort if needed
-      });
-    });
-
-    const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
-      if (snapshot.empty) return;
-      const onlineUsers = snapshot.docs.map(doc => doc.data() as User);
-      setLocalAccounts(prev => {
-        const merged = [...onlineUsers, ...prev];
-        const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
-        return unique;
-      });
-    });
+    // Realtime subscription for users
+    const usersChannel = supabase
+      .channel('users_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setLocalAccounts(prev => [...prev, payload.new as User]);
+        } else if (payload.eventType === 'UPDATE') {
+          setLocalAccounts(prev => prev.map(u => u.id === payload.new.id ? payload.new as User : u));
+        } else if (payload.eventType === 'DELETE') {
+          setLocalAccounts(prev => prev.filter(u => u.id !== payload.old.id));
+        }
+      })
+      .subscribe();
 
     return () => {
-      unsubLaporan();
-      unsubKerusakan();
-      unsubAlsintan();
-      unsubUsers();
+      supabase.removeChannel(laporanChannel);
+      supabase.removeChannel(usersChannel);
     };
   }, []);
 
@@ -515,7 +496,7 @@ export default function App() {
     return () => window.removeEventListener('online', handleOnline);
   }, [addAuditLog]);
 
-  const handleLogin = (user: User) => {
+  const handleLogin = async (user: User) => {
     setCurrentUser(user);
     setActiveMenu('dashboard');
     localStorage.setItem('alsintan_user', JSON.stringify(user));
@@ -528,7 +509,25 @@ export default function App() {
     }
     setCurrentUser(null);
     localStorage.removeItem('alsintan_user');
-    localStorage.removeItem('alsintan_remembered_uid'); // Clear remembered login to prevent auto-login loop
+    localStorage.removeItem('alsintan_remembered_uid_v2');
+  };
+
+  // Wrapper to sync user changes to Supabase
+  const handleSetLocalAccounts = async (updater: User[] | ((prev: User[]) => User[])) => {
+    setLocalAccounts(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      // Find new or updated users and upsert to Supabase
+      const changed = next.filter(nu => {
+        const old = prev.find(u => u.id === nu.id);
+        return !old || JSON.stringify(old) !== JSON.stringify(nu);
+      });
+      if (changed.length > 0) {
+        supabase.from('users').upsert(changed, { onConflict: 'id' }).then(({ error }) => {
+          if (error) console.error('Supabase upsert users error:', error.message);
+        });
+      }
+      return next;
+    });
   };
   const handleMenuClick = (menu: typeof activeMenu) => {
     setActiveMenu(menu);
@@ -542,7 +541,7 @@ export default function App() {
         <LoginView 
           onLoginSuccess={handleLogin} 
           localAccounts={localAccounts}
-          setLocalAccounts={setLocalAccounts}
+          setLocalAccounts={handleSetLocalAccounts}
         />
       ) : (
         <div className="min-h-screen flex flex-col">
@@ -818,7 +817,7 @@ export default function App() {
                       currentUser={currentUser!}
                       auditLogs={auditLogs}
                       localAccounts={localAccounts}
-                      setLocalAccounts={setLocalAccounts}
+                      setLocalAccounts={handleSetLocalAccounts}
                       logoType={logoType}
                       setLogoType={setLogoType}
                       logoUrl={logoUrl}
