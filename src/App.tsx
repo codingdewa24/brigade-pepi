@@ -60,7 +60,12 @@ export default function App() {
   // Persistent States
   const [brigades, setBrigades] = useState<Brigade[]>(() => {
     const saved = localStorage.getItem('alsintan_brigades');
-    return saved ? JSON.parse(saved) : mockBrigades;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const missingBrigades = mockBrigades.filter(mb => !parsed.some((pb: Brigade) => pb.id === mb.id));
+      return [...parsed, ...missingBrigades];
+    }
+    return mockBrigades;
   });
 
   const [alsintanList, setAlsintanList] = useState<Alsintan[]>(() => {
