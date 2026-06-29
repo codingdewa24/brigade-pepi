@@ -2,6 +2,7 @@ import { User, Brigade, Alsintan, Operator, LaporanHarian, RiwayatService, Riway
 import { parseBabelCsvData } from './csvParser';
 import { csvAccountUsers } from './csvAccountData';
 import { csvBrigadeData } from './csvBrigadeData';
+import { csvOperatorData } from './csvOperatorData';
 
 export const mockUsers: User[] = [
   { 
@@ -337,6 +338,9 @@ export const mockOperators: Operator[] = [
   { id: 'opr-005', name: 'Joko Widodo', phone: '085677889905', brigadeId: 'brg-009', status: 'Bertugas' },
   { id: 'opr-006', name: 'Samsul Arifin', phone: '085677889906', brigadeId: 'brg-010', status: 'Tersedia' },
   { id: 'opr-007', name: 'Rian Hidayat', phone: '085677889907', brigadeId: 'brg-011', status: 'Tersedia' },
+  
+  // CSV Operators
+  ...csvOperatorData,
 ];
 
 export const mockLaporanList: LaporanHarian[] = [

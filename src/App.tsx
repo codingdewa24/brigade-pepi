@@ -75,7 +75,12 @@ export default function App() {
 
   const [operators, setOperators] = useState<Operator[]>(() => {
     const saved = localStorage.getItem('alsintan_operators');
-    return saved ? JSON.parse(saved) : mockOperators;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const missingOps = mockOperators.filter(mo => !parsed.some((po: Operator) => po.id === mo.id));
+      return [...parsed, ...missingOps];
+    }
+    return mockOperators;
   });
 
   const [laporanList, setLaporanList] = useState<LaporanHarian[]>(() => {
