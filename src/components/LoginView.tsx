@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Role } from '../types';
 import { Sprout, UserPlus, ArrowLeft, Trash2, Eye, EyeOff } from 'lucide-react';
 import { mockUsers, mockBrigades } from '../data/mockData';
-import { db } from '../lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { supabase } from '../lib/supabase';
 
 interface LoginViewProps {
   onLoginSuccess: (user: User) => void;
@@ -72,7 +71,7 @@ export default function LoginView({ onLoginSuccess, localAccounts, setLocalAccou
       if (isPasswordValid) {
         onLoginSuccess(matchedUser);
         if (rememberMe) {
-          localStorage.setItem('alsintan_remembered_uid', matchedUser.id);
+          localStorage.setItem('alsintan_remembered_uid_v2', matchedUser.id);
         }
       } else {
         setError('PIN / Password salah. Silakan coba lagi.');
@@ -105,7 +104,9 @@ export default function LoginView({ onLoginSuccess, localAccounts, setLocalAccou
     };
 
     setLocalAccounts(prev => [newUser, ...prev]);
-    setDoc(doc(db, 'users', newUser.id), newUser).catch(console.error);
+    supabase.from('users').insert(newUser).then(({ error }) => {
+      if (error) console.error('Supabase insert user error:', error.message);
+    });
 
     setEmail(newUser.id + '@alsintan.id');
     
@@ -128,12 +129,12 @@ export default function LoginView({ onLoginSuccess, localAccounts, setLocalAccou
 
   // Attempt automatic login if a remembered UID exists
   useEffect(() => {
-    const rememberedUid = localStorage.getItem('alsintan_remembered_uid');
+    const rememberedUid = localStorage.getItem('alsintan_remembered_uid_v2');
     if (rememberedUid) {
       const matchedUser = localAccounts.find(u => u.id === rememberedUid);
       if (matchedUser) {
         if (matchedUser.isApproved === false) {
-          localStorage.removeItem('alsintan_remembered_uid');
+          localStorage.removeItem('alsintan_remembered_uid_v2');
           setError('🔒 Akses Ditolak: Akun Anda memerlukan persetujuan Super Admin.');
         } else {
           onLoginSuccess(matchedUser);
