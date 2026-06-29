@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brigade-pangan-cache-v1';
+const CACHE_NAME = 'brigade-pepi-cache-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -94,7 +94,7 @@ self.addEventListener('push', (event) => {
 
   const title = data.title || 'Peringatan Baru!';
   const options = {
-    body: data.body || 'Ada info baru dari sistem Brigade Pangan.',
+    body: data.body || 'Ada info baru dari sistem Brigade PEPI.',
     icon: '/icon-512.jpg',
     badge: '/icon-512.jpg',
     vibrate: [100, 50, 100],

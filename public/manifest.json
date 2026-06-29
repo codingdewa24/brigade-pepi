@@ -1,7 +1,7 @@
 {
-  "name": "Sistem Brigade Alsintan & Pangan",
-  "short_name": "BrigadePangan",
-  "description": "Sistem Informasi Manajemen Brigade Alsintan & Peta Sebaran Interaktif",
+  "name": "Brigade PEPI",
+  "short_name": "Brigade PEPI",
+  "description": "Aplikasi Brigade PEPI untuk manajemen Alsintan & Pangan",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
