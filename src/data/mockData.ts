@@ -1,5 +1,6 @@
 import { User, Brigade, Alsintan, Operator, LaporanHarian, RiwayatService, RiwayatKerusakan, AuditTrail, TargetRealisasi } from '../types';
 import { parseBabelCsvData } from './csvParser';
+import { csvAccountUsers } from './csvAccountData';
 
 export const mockUsers: User[] = [
   { 
@@ -286,6 +287,8 @@ export const mockUsers: User[] = [
     photoUrl: 'https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=150&auto=format&fit=crop&q=80',
     isApproved: true
   },
+  // CSV ACCOUNTS (498 akun dari daftar_akun_brigade.csv)
+  ...csvAccountUsers,
 ];
 
 export const mockBrigades: Brigade[] = [
