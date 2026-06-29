@@ -163,12 +163,12 @@ export default function SecuritySettingsView({
 
   const handleSaveBranding = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('alsintan_logo_type', logoType);
-    localStorage.setItem('alsintan_logo_url', logoUrl);
-    localStorage.setItem('alsintan_portal_title', portalTitle);
-    localStorage.setItem('alsintan_portal_subtitle', portalSubtitle);
-    localStorage.setItem('alsintan_login_title', loginTitle);
-    localStorage.setItem('alsintan_login_subtitle', loginSubtitle);
+    localStorage.setItem('alsintan_logo_type_v2', logoType);
+    localStorage.setItem('alsintan_logo_url_v2', logoUrl);
+    localStorage.setItem('alsintan_portal_title_v2', portalTitle);
+    localStorage.setItem('alsintan_portal_subtitle_v2', portalSubtitle);
+    localStorage.setItem('alsintan_login_title_v2', loginTitle);
+    localStorage.setItem('alsintan_login_subtitle_v2', loginSubtitle);
 
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -176,19 +176,19 @@ export default function SecuritySettingsView({
 
   const handleResetBranding = () => {
     if (window.confirm('Apakah Anda yakin ingin mengembalikan semua logo dan teks ke setelan default pabrik?')) {
-      setLogoType('default');
-      setLogoUrl('');
-      setPortalTitle('Sistem Informasi Laporan Kinerja Alsintan');
-      setPortalSubtitle('Sistem Informasi Pemantauan & Pelaporan Alat Mesin Pertanian');
+      setLogoType('custom');
+      setLogoUrl('/icon-512.jpg');
+      setPortalTitle('Brigade PEPI');
+      setPortalSubtitle('KEMENTAN BRIGADE PANGAN');
       setLoginTitle('Login seperti Akun Google');
       setLoginSubtitle('Pilih profil Anda untuk mulai mengisi laporan Brigade Pangan secara praktis');
 
-      localStorage.setItem('alsintan_logo_type', 'default');
-      localStorage.setItem('alsintan_logo_url', '');
-      localStorage.setItem('alsintan_portal_title', 'Sistem Informasi Laporan Kinerja Alsintan');
-      localStorage.setItem('alsintan_portal_subtitle', 'Sistem Informasi Pemantauan & Pelaporan Alat Mesin Pertanian');
-      localStorage.setItem('alsintan_login_title', 'Login seperti Akun Google');
-      localStorage.setItem('alsintan_login_subtitle', 'Pilih profil Anda untuk mulai mengisi laporan Brigade Pangan secara praktis');
+      localStorage.setItem('alsintan_logo_type_v2', 'default');
+      localStorage.setItem('alsintan_logo_url_v2', '');
+      localStorage.setItem('alsintan_portal_title_v2', 'Sistem Informasi Laporan Kinerja Alsintan');
+      localStorage.setItem('alsintan_portal_subtitle_v2', 'Sistem Informasi Pemantauan & Pelaporan Alat Mesin Pertanian');
+      localStorage.setItem('alsintan_login_title_v2', 'Login seperti Akun Google');
+      localStorage.setItem('alsintan_login_subtitle_v2', 'Pilih profil Anda untuk mulai mengisi laporan Brigade Pangan secara praktis');
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);

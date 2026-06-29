@@ -25,12 +25,12 @@ export default function LoginView({ onLoginSuccess, localAccounts, setLocalAccou
   const [successNotice, setSuccessNotice] = useState('');
 
   // Customization Branding States loaded from localStorage
-  const [logoType, setLogoType] = useState(() => localStorage.getItem('alsintan_logo_type') || 'default');
-  const [logoUrl, setLogoUrl] = useState(() => localStorage.getItem('alsintan_logo_url') || '');
-  const [portalTitle, setPortalTitle] = useState(() => localStorage.getItem('alsintan_portal_title') || 'Laporan Kinerja Alsintan');
-  const [portalSubtitle, setPortalSubtitle] = useState(() => localStorage.getItem('alsintan_portal_subtitle') || 'KEMENTAN BRIGADE PANGAN');
-  const [loginTitle, setLoginTitle] = useState(() => localStorage.getItem('alsintan_login_title') || 'Login seperti Akun Google');
-  const [loginSubtitle, setLoginSubtitle] = useState(() => localStorage.getItem('alsintan_login_subtitle') || 'Pilih profil Anda untuk mulai mengisi laporan Brigade Pangan secara praktis');
+  const [logoType, setLogoType] = useState(() => localStorage.getItem('alsintan_logo_type_v2') || 'custom');
+  const [logoUrl, setLogoUrl] = useState(() => localStorage.getItem('alsintan_logo_url_v2') || '/icon-512.jpg');
+  const [portalTitle, setPortalTitle] = useState(() => localStorage.getItem('alsintan_portal_title_v2') || 'Brigade PEPI');
+  const [portalSubtitle, setPortalSubtitle] = useState(() => localStorage.getItem('alsintan_portal_subtitle_v2') || 'KEMENTAN BRIGADE PANGAN');
+  const [loginTitle, setLoginTitle] = useState(() => localStorage.getItem('alsintan_login_title_v2') || 'Login seperti Akun Google');
+  const [loginSubtitle, setLoginSubtitle] = useState(() => localStorage.getItem('alsintan_login_subtitle_v2') || 'Pilih profil Anda untuk mulai mengisi laporan Brigade Pangan secara praktis');
 
   // Load custom branding on mount (if dynamic updates needed, useEffect can be used, but state is already initialized)
   useEffect(() => {
